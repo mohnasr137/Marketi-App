@@ -2,7 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-//other files
+//routers
 const authRouter = require("./routers/auth");
 const authJwt = require("./middlewares/jwt");
 
@@ -13,12 +13,11 @@ const url = process.env.API_URL;
 
 //middlewares
 app.use(express.json());
-// app.use(authJwt);
+app.use(authJwt);
 
-//actions
 app.use(`${url}/auth`, authRouter);
-app.use("/", (req, res) => {
-  res.send(process.env.API_URL);
+app.use(`${url}/can`, (req, res) => {
+  res.send("jwt is working and api is secured");
 });
 
 //connection
