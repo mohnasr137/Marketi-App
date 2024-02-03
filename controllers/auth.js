@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const {verifyEmail} = require("../controllers/verify");
 
 const signUp = async (req, res) => {
   try {
@@ -37,18 +38,29 @@ const signUp = async (req, res) => {
       phone,
       email,
       password: hashedPassword,
+      verify: false,
     });
     user = await user.save();
     res.json(user);
+    const token = jwt.sign({ id: user._id }, process.env.SECRET);
+    const link =
+      req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
+    verifyEmail(email, link);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 const signIn = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password} = req.body;
+    console.log(req.body);
     const user = await User.findOne({ email });
+    if (user.verify === false) {
+      return res
+        .status(400)
+        .json({ message: "the user with this email does not verifyed!" });
+    }
     if (!user) {
       return res
         .status(400)
@@ -68,7 +80,7 @@ const signIn = async (req, res) => {
       status: true,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
