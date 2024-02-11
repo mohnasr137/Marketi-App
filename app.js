@@ -13,7 +13,7 @@ const url = process.env.API_URL;
 
 //middlewares
 app.use(express.json());
-app.use(authJwt);
+// app.use(authJwt);
 
 app.use(`${url}/auth`, authRouter);
 app.use(`${url}/can`, (req, res) => {

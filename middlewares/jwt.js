@@ -15,9 +15,9 @@ const authJwt = async (req, res, next) => {
       }
     }
     let token = req.body.token;
-    if(token === undefined){
-      token = req.url.replace(`${url}/auth/verify/`, "");;
-    }
+    // if(token === undefined){
+    //   token = req.url.replace(`${url}/auth/verify/`, "");;
+    // }
     if (!token) {
       return res.status(500).json("no token");
     }
@@ -29,7 +29,7 @@ const authJwt = async (req, res, next) => {
     if(!user){
       return res.status(500).json("fake user");
     }
-    res.locals.id = isVerify.id;
+    // res.locals.id = isVerify.id;
     return next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
