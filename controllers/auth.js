@@ -33,7 +33,7 @@ const signUp = async (req, res) => {
         .json({ message: "the user with same email already exists!" });
     }
     if (existingUser && existingUser.verify === false) {
-      await User.findOneAndRemove({ email });
+      await User.deleteOne({ email });
     }
     const hashedPassword = await bcryptjs.hash(password, 8);
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
@@ -46,10 +46,10 @@ const signUp = async (req, res) => {
     });
     user = await user.save();
     res.json(user);
-    // const token = jwt.sign({ id: user._id }, process.env.SECRET);
-    // const link =
-    //   req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
-    verifyEmail(email, code,true);
+    const token = jwt.sign({ id: user._id, code: code }, process.env.SECRET);
+    const link =
+      req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
+    verifyEmail(email, code, link);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -62,8 +62,8 @@ const signIn = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res
-      .status(400)
-      .json({ message: "the user with this email not found!" });
+        .status(400)
+        .json({ message: "the user with this email not found!" });
     }
     if (user.verify === false) {
       return res
