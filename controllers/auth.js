@@ -49,6 +49,7 @@ const signUp = async (req, res) => {
     const link =
       req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
     verifyEmail(email, code, link);
+    return res.status(200).json({ message: "email send successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
