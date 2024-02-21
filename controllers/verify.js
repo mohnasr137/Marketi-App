@@ -70,7 +70,7 @@ const verifyEmail = async (email, code, link) => {
     // });
     // console.log(`${about} email send successfully`);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 
