@@ -5,6 +5,7 @@ const bcryptjs = require("bcryptjs");
 
 const verifyEmail = async (email, code, link) => {
   try {
+    console.log("here");
     if (link) {
       let transporter = nodemailer.createTransport({
         service: "Gmail",
@@ -25,7 +26,7 @@ const verifyEmail = async (email, code, link) => {
       </dev>
       `,
       });
-      console.log(`Verification email send successfully`);
+      console.log("Verification email send successfully");
     } else {
       let transporter = nodemailer.createTransport({
         service: "Gmail",
@@ -46,7 +47,7 @@ const verifyEmail = async (email, code, link) => {
       </dev>
       `,
       });
-      console.log(`resetPassword email send successfully`);
+      console.log("resetPassword email send successfully");
     }
     // let transporter = nodemailer.createTransport({
     //   service: "Gmail",

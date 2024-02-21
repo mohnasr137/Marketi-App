@@ -45,7 +45,6 @@ const signUp = async (req, res) => {
       code,
     });
     user = await user.save();
-    res.json(user);
     const token = jwt.sign({ id: user._id, code: code }, process.env.SECRET);
     const link =
       req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
