@@ -2,6 +2,10 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const bcryptjs = require("bcryptjs");
+const twilio = require("twilio")(
+  process.env.WILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 const verifyEmail = async (email, code, link) => {
   try {
@@ -72,6 +76,24 @@ const verifyEmail = async (email, code, link) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const phoneCode = async (phone, code) => {
+  // try {
+  //   let message = await twilio.messages.create({
+  //     from: process.env.TWILIO_NUMBER,
+  //     to: phone,
+  //     body: `
+  //     <dev>
+  //     <h3>resetPassword Code: </h3>
+  //     <h1 style="color:red;">${code}</h1>
+  //     </dev>
+  //     `,
+  //   });
+  //   console.log(message);
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
 
 const activeEmail = async (req, res) => {
@@ -146,7 +168,7 @@ const activeEmail = async (req, res) => {
 
 const sendPassCode = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, byGmail } = req.body;
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res
@@ -160,8 +182,17 @@ const sendPassCode = async (req, res) => {
     }
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
     await User.updateOne({ email }, { $set: { code } });
-    verifyEmail(email, code);
-    return res.status(200).json({ message: "password code send successfully" });
+    if (byGmail) {
+      verifyEmail(email, code);
+      return res
+        .status(200)
+        .json({ message: "password code send successfully" });
+    } else {
+      phoneCode(existingUser.phone, code);
+      return res
+        .status(200)
+        .json({ message: "phone code send successfully" });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

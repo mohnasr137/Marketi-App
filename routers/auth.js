@@ -17,6 +17,6 @@ authRouter.post("/verify/sendPassCode", sendPassCode);
 authRouter.post("/verify/activePass", activePass);
 authRouter.post("/verify/resetPassCode", resetPassCode);
 authRouter.post("/verify/resetPass", resetPass);
-authRouter.post("/verify/:token", activeEmail);
+authRouter.get("/verify/:token", activeEmail);
 
 module.exports = authRouter;
