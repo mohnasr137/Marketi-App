@@ -168,7 +168,8 @@ const activeEmail = async (req, res) => {
 
 const sendPassCode = async (req, res) => {
   try {
-    const { email, byGmail } = req.body;
+    const { email } = req.body;
+    const byGmail = true;
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res
