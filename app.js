@@ -5,7 +5,8 @@ const mongoose = require("mongoose");
 //routers
 const authRouter = require("./routers/auth");
 const authJwt = require("./middlewares/jwt");
-const passportSetup = require("./controllers/oAuth");
+const passportGoogleSetup = require("./controllers/googleAuth");
+const passportFacebookSetup = require("./controllers/facebookAuth");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const session = require("express-session");

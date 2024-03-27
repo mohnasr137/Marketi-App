@@ -22,9 +22,34 @@ authRouter.get(
   "/oAuth/google/redirect",
   passport.authenticate("google"),
   (req, res) => {
-    return res.status(200).json({ message: "oAuth successfully login" });
+    return res.status(200).json({ message: "google oAuth successfully login" });
   }
 );
+
+authRouter.get(
+  "/oAuth/facebook",
+  passport.authenticate("facebook", { scope: "email" })
+);
+authRouter.get(
+  "/oAuth/facebook/redirect",
+  passport.authenticate("facebook"),
+  (req, res) => {
+    return res
+      .status(200)
+      .json({ message: "facebook oAuth successfully login" });
+  }
+);
+
+authRouter.get("/oAuth/signOut", (req, res) => {
+  try {
+    req.session.destroy(function (err) {
+      console.log("session destroyed.");
+    });
+    return res.status(200).json({ message: "session destroyed." });
+  } catch (err) {
+    res.status(400).send({ message: "Failed to sign out" });
+  }
+});
 //ddddddddddddddddddddddddddddddddddddddddddddd
 authRouter.post("/verify/sendPassCode", sendPassCode);
 authRouter.post("/verify/activePass", activePass);
