@@ -10,7 +10,7 @@ const passportFacebookSetup = require("./controllers/facebookAuth");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
-
+const connectMongo = require("connect-mongo")
 //init
 const app = express();
 const port = process.env.PORT;
@@ -21,11 +21,15 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.COOKIE_KEYS,
+    store: connectMongo.create({
+      mongoUrl: process.env.CONNECTION_STRING,
+    }),
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true },
   })
 );
+
 // app.use(
 //   cookieSession({
 //     maxAge: 24 * 60 * 60 * 1000,
