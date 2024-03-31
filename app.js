@@ -21,12 +21,14 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.COOKIE_KEYS,
+    maxAge: 24 * 60 * 60 * 1000,
     store: connectMongo.create({
       mongoUrl: process.env.CONNECTION_STRING,
     }),
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true },
+    httpsOnly: true,
   })
 );
 
