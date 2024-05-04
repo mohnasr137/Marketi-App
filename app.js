@@ -4,13 +4,14 @@ const mongoose = require("mongoose");
 
 //routers
 const authRouter = require("./routers/auth");
+const homeRouter = require("./routers/home");
 const authJwt = require("./middlewares/jwt");
 const passportGoogleSetup = require("./controllers/googleAuth");
 const passportFacebookSetup = require("./controllers/facebookAuth");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
-const connectMongo = require("connect-mongo")
+const connectMongo = require("connect-mongo");
 //init
 const app = express();
 const port = process.env.PORT;
@@ -28,7 +29,6 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true },
-    httpsOnly: true,
   })
 );
 
@@ -56,6 +56,7 @@ app.use(passport.session());
 // app.use(authJwt);
 
 app.use(`${url}/auth`, authRouter);
+app.use(`${url}/home`, homeRouter);
 app.use(`${url}/can`, (req, res) => {
   res.send("jwt is working and api is secured");
 });
