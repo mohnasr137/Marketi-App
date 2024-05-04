@@ -10,6 +10,7 @@ const {
   resetPass,
 } = require("../controllers/verify");
 const authRouter = express.Router();
+const url = process.env.API_URL;
 
 authRouter.post("/signUp", signUp);
 authRouter.post("/signIn", signIn);
@@ -22,7 +23,7 @@ authRouter.get(
   "/oAuth/google/redirect",
   passport.authenticate("google"),
   (req, res) => {
-    return res.status(200).json({ message: "google oAuth successfully login" });
+    res.redirect(301, `${url}/home/start`);
   }
 );
 
@@ -34,9 +35,7 @@ authRouter.get(
   "/oAuth/facebook/redirect",
   passport.authenticate("facebook"),
   (req, res) => {
-    return res
-      .status(200)
-      .json({ message: "facebook oAuth successfully login" });
+    res.redirect(301, `${url}/home/start`);
   }
 );
 

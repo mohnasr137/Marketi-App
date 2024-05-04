@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+//const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
@@ -83,6 +83,7 @@ const signIn = async (req, res) => {
       statusCode: 200,
       status: true,
     });
+    //res.redirect(301, `${url}/home/start`);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
