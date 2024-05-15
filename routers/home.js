@@ -62,11 +62,6 @@ homeRouter.get("/start", async (req, res) => {
   const email = existingUser.email;
   const image = await Image.findOne({ userEmail: email });
   const base64Image = Buffer.from(image.data).toString("base64");
-  console.log(
-    fs.readFileSync(
-      "C:\\Users\\MohNasr\\Desktop\\myProjects\\Node\\ecommerce\\Simple.jpg"
-    )
-  );
   console.log(image.data);
   console.log(base64Image);
   res.json({
