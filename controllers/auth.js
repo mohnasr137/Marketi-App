@@ -1,6 +1,8 @@
 //const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
+const fs = require("fs");
 const User = require("../models/user");
+const Image = require("../models/image");
 const jwt = require("jsonwebtoken");
 const { verifyEmail } = require("../controllers/verify");
 
@@ -37,6 +39,17 @@ const signUp = async (req, res) => {
     }
     const hashedPassword = await bcryptjs.hash(password, 8);
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const defaultImage = new Image({
+      name: "default_image.jpg",
+      userEmail: email,
+      data: fs.readFileSync(
+        "C:\\Users\\MohNasr\\Desktop\\myProjects\\Node\\ecommerce\\Simple.jpg"
+      ),
+      contentType: "image/jpeg",
+    });
+    await defaultImage.save();
+
     let user = new User({
       name,
       phone,
