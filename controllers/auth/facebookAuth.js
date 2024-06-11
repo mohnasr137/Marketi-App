@@ -1,6 +1,6 @@
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook");
-const facebookUser = require("../models/facebookUser");
+const facebookUser = require("../../models/facebookUser");
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

@@ -1,11 +1,14 @@
-//const mongoose = require("mongoose");
+// packages
 const bcryptjs = require("bcryptjs");
 const fs = require("fs");
-const User = require("../models/user");
-const Image = require("../models/image");
 const jwt = require("jsonwebtoken");
-const { verifyEmail } = require("../controllers/verify");
 
+// imports
+const User = require("../../models/user");
+const Image = require("../../models/image");
+const { sendVerifyEmail } = require("./verifyEmail");
+
+// routers
 const signUp = async (req, res) => {
   try {
     const { name, phone, email, password, confirmPassword } = req.body;
@@ -39,7 +42,6 @@ const signUp = async (req, res) => {
     }
     const hashedPassword = await bcryptjs.hash(password, 8);
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
-
     let user = new User({
       name,
       phone,
@@ -50,9 +52,9 @@ const signUp = async (req, res) => {
     user = await user.save();
     const token = jwt.sign({ id: user._id, code: code }, process.env.SECRET);
     const link =
-      req.protocol + "://" + req.get("host") + `/api/v1/auth/verify/${token}`;
-    verifyEmail(email, code, link);
-    return res.status(200).json({ message: "email send successfully" });
+      req.protocol + "://" + req.get("host") + `/api/v1/auth/${token}`;
+    sendVerifyEmail(email, link);
+    return res.status(200).json({ message: "user created and Verify email send successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
