@@ -1,37 +1,86 @@
 const mongoose = require("mongoose");
+const Category = require("./category");
 
-const productSchema = mongoose.Schema({
-  id: {
-    require: true,
-    type: Number,
-    trim: true,
+const productSchema = mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    images: [
+      {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    ],
+    rating: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 5,
+    },
+    location: {
+      name: {
+        type: String,
+        trim: true,
+      },
+      location: {
+        type: {
+          type: String,
+          enum: ["Point"],
+          required: true,
+        },
+        coordinates: {
+          type: [Number],
+          required: true,
+          default: [0, 0],
+        },
+      },
+    },
+    discount: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+    },
+    remain: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    sold: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    category: {
+      required: true,
+      type: String,
+      trim: true,
+    },
+    brand: {
+      required: true,
+      type: String,
+      trim: true,
+    },
   },
-  title: {
-    require: true,
-    type: String,
-    trim: true,
-  },
-  price: {
-    require: true,
-    type: Number,
-    trim: true,
-  },
-  description: {
-    require: true,
-    type: String,
-    trim: true,
-  },
-  image: {
-    require: true,
-    type: String,
-    trim: true,
-  },
-  rating: {
-    require: true,
-    type: Number,
-    trim: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const Product = mongoose.model("Product", productSchema);
+
 module.exports = Product;
