@@ -85,14 +85,6 @@ const resetPassword = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
     const passwordMatch =
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-    if (!password.match(passwordMatch)) {
-      return res.status(400).json({ message: "please enter a valid password" });
-    }
-    if (password !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ message: "password and confirm password are not the same" });
-    }
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res
@@ -108,6 +100,14 @@ const resetPassword = async (req, res) => {
       return res
         .status(400)
         .json({ message: "this email not activated to reset password!" });
+    }
+    if (!password.match(passwordMatch)) {
+      return res.status(400).json({ message: "please enter a valid password" });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "password and confirm password are not the same",
+      });
     }
     const hashedPassword = await bcryptjs.hash(password, 8);
     await User.updateOne(

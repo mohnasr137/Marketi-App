@@ -42,14 +42,14 @@ const signUp = async (req, res) => {
     }
     const hashedPassword = await bcryptjs.hash(password, 8);
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
-    let user = new User({
+    const user = new User({
       name,
       phone,
       email,
       password: hashedPassword,
       code,
     });
-    user = await user.save();
+    await user.save();
     const token = jwt.sign({ id: user._id, code: code }, process.env.SECRET);
     const link =
       req.protocol + "://" + req.get("host") + `/api/v1/auth/${token}`;
@@ -63,7 +63,6 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
     const user = await User.findOne({ email });
     if (!user) {
       return res

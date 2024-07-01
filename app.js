@@ -1,6 +1,8 @@
 // packages
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
+const cors = require("cors");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
@@ -9,7 +11,9 @@ const connectMongo = require("connect-mongo");
 // imports
 const authRouter = require("./routers/auth");
 const homeRouter = require("./routers/home");
+const dataRouter = require("./routers/data");
 const authJwt = require("./middlewares/jwt");
+const topSearch = require("./middlewares/topSearch");
 const passportGoogleSetup = require("./controllers/auth/googleAuth");
 const passportFacebookSetup = require("./controllers/auth/facebookAuth");
 
@@ -19,7 +23,22 @@ const port = process.env.PORT;
 const url = process.env.API_URL;
 
 // middlewares
+app.use(cors());
+app.options("*", cors());
 app.use(express.json());
+app.use(`${url}/images`, express.static(path.join(__dirname, "views")));
+// app.use(
+//   `${url}/images/brands`,
+//   express.static(path.join(__dirname, "views", "brands"))
+// );
+// app.use(
+//   `${url}/images/categories`,
+//   express.static(path.join(__dirname, "views", "categories"))
+// );
+// app.use(
+//   `${url}/images/portfoilo`,
+//   express.static(path.join(__dirname, "views", "portfoilo"))
+// );
 // app.use(
 //   session({
 //     secret: process.env.COOKIE_KEYS,
@@ -54,14 +73,13 @@ app.use(express.json());
 // app.use(passport.initialize());
 // app.use(passport.session());
 // app.use(authJwt);
+app.use(topSearch);
 
 // routers
 app.use(`${url}/auth`, authRouter);
 app.use(`${url}/home`, homeRouter);
-app.use(`${url}/test`, (req, res) => {
-  res.send("hi from test:- jwt is working and api is secured");
-});
-app.use(`${url}/:error`, (req, res) => {
+app.use(`${url}/data`, dataRouter);
+app.use(`/:error`, (req, res) => {
   const { error } = req.params;
   res.send(`hi from error:- you write ${error} and there is no api like this`);
 });
@@ -75,6 +93,4 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-app.listen(port, () => {
-  console.log(`servr is listen on http://localhost:${port}`);
-});
+app.listen(port, console.log(`servr is listen on http://localhost:${port}`));
