@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("passport");
 const cookieSession = require("cookie-session");
@@ -25,8 +26,11 @@ const url = process.env.API_URL;
 // middlewares
 app.use(cors());
 app.options("*", cors());
-app.use(express.json());
+//app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(`${url}/images`, express.static(path.join(__dirname, "views")));
+app.use(`${url}/uploads`, express.static(path.join(__dirname, "uploads")));
 // app.use(
 //   `${url}/images/brands`,
 //   express.static(path.join(__dirname, "views", "brands"))

@@ -27,7 +27,6 @@ const productSchema = mongoose.Schema(
     ],
     rating: {
       type: Number,
-      required: true,
       min: 0,
       max: 5,
     },
@@ -62,7 +61,6 @@ const productSchema = mongoose.Schema(
     },
     sold: {
       type: Number,
-      required: true,
       min: 0,
     },
     category: {
