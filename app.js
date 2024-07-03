@@ -12,6 +12,7 @@ const connectMongo = require("connect-mongo");
 // imports
 const authRouter = require("./routers/auth");
 const homeRouter = require("./routers/home");
+const userRouter = require("./routers/user");
 const dataRouter = require("./routers/data");
 const authJwt = require("./middlewares/jwt");
 const topSearch = require("./middlewares/topSearch");
@@ -29,7 +30,7 @@ app.options("*", cors());
 //app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(`${url}/images`, express.static(path.join(__dirname, "views")));
+app.use(`${url}/images`, express.static(path.join(__dirname, "images")));
 app.use(`${url}/uploads`, express.static(path.join(__dirname, "uploads")));
 // app.use(
 //   `${url}/images/brands`,
@@ -82,6 +83,7 @@ app.use(topSearch);
 // routers
 app.use(`${url}/auth`, authRouter);
 app.use(`${url}/home`, homeRouter);
+app.use(`${url}/user`, userRouter);
 app.use(`${url}/data`, dataRouter);
 app.use(`/:error`, (req, res) => {
   const { error } = req.params;

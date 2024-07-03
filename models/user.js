@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Product = require("../models/product");
 
 const userSchema = mongoose.Schema({
   name: {
@@ -32,10 +33,38 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  image: {
+    require: true,
+    type: String,
+    trim: true,
+  },
   code: {
     type: String,
   },
-  //cart
+  myProduct: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
+  cart: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
+  favorite: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
+  buyAgain: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);
