@@ -42,7 +42,6 @@ const activeEmail = async (req, res) => {
     if (!token) {
       return res.status(400).json({ message: "no token" });
     }
-    console.log(token);
     const isVerify = jwt.verify(token, process.env.SECRET);
     if (!isVerify) {
       return res.status(400).json({ message: "not verify" });

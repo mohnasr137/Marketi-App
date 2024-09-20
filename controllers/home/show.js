@@ -1,8 +1,16 @@
+// packages
+const path = require("path");
+const fs = require("fs").promises;
+
 // imports
 const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Brand = require("../../models/brand");
 const TopSearch = require("../../models/topSearch");
+
+// init
+const url = process.env.API_URL;
+
 // routers
 const allProducts = async (req, res) => {
   try {
@@ -56,7 +64,7 @@ const allProducts = async (req, res) => {
 const allCategories = async (req, res) => {
   try {
     const { name } = req.body;
-    let list
+    let list;
     if (name) {
       list = await Category.find({}, { name: 1, _id: 0 });
     } else {
@@ -104,4 +112,30 @@ const allTopSearch = async (req, res) => {
   }
 };
 
-module.exports = { allProducts, allBrands, allCategories, allTopSearch };
+const allBanners = async (req, res) => {
+  try {
+    let list = [];
+    const directoryPath = path.join(__dirname, "../../images/banners");
+    const files = await fs.readdir(directoryPath);
+    for (const file of files) {
+      const imagePath = path.join(`${url}/images/banners`, file);
+      list.push(imagePath);
+    }
+    if (list.length == 0) {
+      return res.status(404).json({ message: "there is no result" });
+    } else {
+      return res.status(200).json({ list });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  allProducts,
+  allBrands,
+  allCategories,
+  allBanners,
+  allTopSearch,
+  allBanners,
+};
