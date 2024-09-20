@@ -1,6 +1,7 @@
 // packages
 const express = require("express");
 const multer = require("multer");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // imports
 const {
@@ -15,6 +16,8 @@ const {
   deleteFavorite,
   addRate,
   addImage,
+  getBuyAgain,
+  checkout,
 } = require("../controllers/home/bacicUser");
 
 // init
@@ -51,5 +54,23 @@ userRouter.delete("/deleteCart", deleteCart);
 userRouter.delete("/deleteFavorite", deleteFavorite);
 userRouter.post("/addRate", addRate);
 userRouter.post("/addImage", upload.single("file"), addImage);
+userRouter.get("/getBuyAgain", getBuyAgain);
+userRouter.post("/checkout", checkout);
+
+userRouter.get("/complete", async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(
+    req.query.session_id,
+    {
+      expand: ["payment_intent.payment_method"],
+    }
+  );
+
+  console.log(JSON.stringify(session));
+  res.send("Your payment was successful");
+});
+
+userRouter.get("/cancel", (req, res) => {
+  res.redirect("/");
+});
 
 module.exports = userRouter;

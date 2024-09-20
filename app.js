@@ -99,4 +99,4 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-app.listen(port, console.log(`servr is listen on http://localhost:${port}`));
+app.listen(port, console.log(`server is listen on http://localhost:${port}`));

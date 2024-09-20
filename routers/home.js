@@ -5,6 +5,7 @@ const express = require("express");
 const {
   allProducts,
   allBrands,
+  allBanners,
   allCategories,
   allTopSearch,
 } = require("../controllers/home/show");
@@ -16,6 +17,7 @@ const homeRouter = express.Router();
 homeRouter.get("/products", allProducts);
 homeRouter.get("/categories", allCategories);
 homeRouter.get("/brands", allBrands);
+homeRouter.get("/banners", allBanners);
 homeRouter.get("/topSearch", allTopSearch);
 
 module.exports = homeRouter;
