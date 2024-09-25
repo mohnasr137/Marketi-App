@@ -128,7 +128,8 @@ const editProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const { productId, userId } = req.body;
+    const userId = req.userId;
+    const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       const existingProduct = await Product.findOne({ _id: productId });
@@ -158,7 +159,7 @@ const deleteProduct = async (req, res) => {
 
 const getCart = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       let list = [];
@@ -179,7 +180,7 @@ const getCart = async (req, res) => {
 
 const getFavorite = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       let list = [];
@@ -200,7 +201,8 @@ const getFavorite = async (req, res) => {
 
 const addCart = async (req, res) => {
   try {
-    const { userId, productId } = req.body;
+    const userId = req.userId;
+    const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       list = existingUser.cart;
@@ -225,7 +227,8 @@ const addCart = async (req, res) => {
 
 const addFavorite = async (req, res) => {
   try {
-    const { userId, productId } = req.body;
+    const userId = req.userId;
+    const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       list = existingUser.favorite;
@@ -250,7 +253,8 @@ const addFavorite = async (req, res) => {
 
 const deleteCart = async (req, res) => {
   try {
-    const { productId, userId } = req.body;
+    const userId = req.userId;
+    const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       const indexToRemove = existingUser.cart.indexOf(productId);
@@ -269,7 +273,8 @@ const deleteCart = async (req, res) => {
 
 const deleteFavorite = async (req, res) => {
   try {
-    const { productId, userId } = req.body;
+    const userId = req.userId;
+    const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       const indexToRemove = existingUser.favorite.indexOf(productId);
@@ -308,7 +313,7 @@ const addRate = async (req, res) => {
 
 const addImage = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
     const imagePath = req.file.path;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
@@ -327,7 +332,7 @@ const addImage = async (req, res) => {
 
 const getBuyAgain = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
     const existingUser = await User.findOne({ _id: userId });
     if (existingUser) {
       let list = [];

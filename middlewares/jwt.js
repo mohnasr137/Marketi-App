@@ -26,10 +26,11 @@ const authJwt = async (req, res, next) => {
       return res.status(500).json("not verify");
     }
     const user = await User.findById(isVerify.id);
-    if(!user){
+    if (!user) {
       return res.status(500).json("fake user");
     }
     // res.locals.id = isVerify.id;
+    req.userId = isVerify.id;
     return next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
