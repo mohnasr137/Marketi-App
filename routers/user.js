@@ -1,6 +1,7 @@
 // packages
 const express = require("express");
 const multer = require("multer");
+const path = require("path");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // imports
@@ -15,9 +16,8 @@ const {
   deleteCart,
   deleteFavorite,
   addRate,
-  addImage,
   getBuyAgain,
-  checkout,
+  // checkout,
 } = require("../controllers/home/bacicUser");
 
 // init
@@ -27,7 +27,9 @@ const storage = multer.diskStorage({
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    const code = `${Math.floor(100000 + Math.random() * 900000)}`;
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + "-" + code + ext);
   },
 });
 const upload = multer({
@@ -53,24 +55,23 @@ userRouter.post("/addFavorite", addFavorite);
 userRouter.delete("/deleteCart", deleteCart);
 userRouter.delete("/deleteFavorite", deleteFavorite);
 userRouter.post("/addRate", addRate);
-userRouter.post("/addImage", upload.single("file"), addImage);
 userRouter.get("/getBuyAgain", getBuyAgain);
-userRouter.post("/checkout", checkout);
+// userRouter.post("/checkout", checkout);
 
-userRouter.get("/complete", async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(
-    req.query.session_id,
-    {
-      expand: ["payment_intent.payment_method"],
-    }
-  );
+// userRouter.get("/complete", async (req, res) => {
+//   const session = await stripe.checkout.sessions.retrieve(
+//     req.query.session_id,
+//     {
+//       expand: ["payment_intent.payment_method"],
+//     }
+//   );
 
-  console.log(JSON.stringify(session));
-  res.send("Your payment was successful");
-});
+//   console.log(JSON.stringify(session));
+//   res.send("Your payment was successful");
+// });
 
-userRouter.get("/cancel", (req, res) => {
-  res.redirect("/");
-});
+// userRouter.get("/cancel", (req, res) => {
+//   res.redirect("/");
+// });
 
 module.exports = userRouter;

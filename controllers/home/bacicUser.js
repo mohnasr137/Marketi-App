@@ -311,25 +311,6 @@ const addRate = async (req, res) => {
   }
 };
 
-const addImage = async (req, res) => {
-  try {
-    const userId = req.userId;
-    const imagePath = req.file.path;
-    const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      await User.updateOne({ _id: userId }, { $set: { image: imagePath } });
-      if (path.join(`${url}/images/portfoilo`, "simple.jpg") !== imagePath) {
-        fs.unlinkSync(path.join(__dirname, imagePath));
-      }
-      return res.status(200).json({ message: "image added successfuly" });
-    } else {
-      return res.status(400).json({ message: "user not exist" });
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
 const getBuyAgain = async (req, res) => {
   try {
     const userId = req.userId;
@@ -351,48 +332,48 @@ const getBuyAgain = async (req, res) => {
   }
 };
 
-const checkout = async (req, res) => {
-  try {
-    const { userId, products } = req.body;
-    const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      const list = products.map((x) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: x.product.title,
-          },
-          unit_amount: Math.round(x.product.price * 100),
-        },
-        quantity: x.quantity,
-      }));
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: list,
-        mode: "payment",
-        success_url:
-          "http://localhost:3000/api/v1/user/complete?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "http://localhost:3000/api/v1/user/cancel",
-      });
-      res.redirect(session.url);
-      console.log("here1");
-      // if (session) {
-      //   let buyList = existingUser.buyAgain;
-      //   products.forEach(async (x) => {
-      //     buyList.push(x.product._id);
-      //   });
-      //   await User.updateOne({ _id: userId }, { $set: { buyAgain: buyList } });
-      //   return res.status(200).json({ message: "payment successfuly" });
-      // } else {
-      //   return res.status(400).json({ message: "payment failed" });
-      // }
-    } else {
-      return res.status(400).json({ message: "user not exist" });
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
+// const checkout = async (req, res) => {
+//   try {
+//     const { userId, products } = req.body;
+//     const existingUser = await User.findOne({ _id: userId });
+//     if (existingUser) {
+//       const list = products.map((x) => ({
+//         price_data: {
+//           currency: "usd",
+//           product_data: {
+//             name: x.product.title,
+//           },
+//           unit_amount: Math.round(x.product.price * 100),
+//         },
+//         quantity: x.quantity,
+//       }));
+//       const session = await stripe.checkout.sessions.create({
+//         payment_method_types: ["card"],
+//         line_items: list,
+//         mode: "payment",
+//         success_url:
+//           "http://localhost:3000/api/v1/user/complete?session_id={CHECKOUT_SESSION_ID}",
+//         cancel_url: "http://localhost:3000/api/v1/user/cancel",
+//       });
+//       res.redirect(session.url);
+//       console.log("here1");
+//       // if (session) {
+//       //   let buyList = existingUser.buyAgain;
+//       //   products.forEach(async (x) => {
+//       //     buyList.push(x.product._id);
+//       //   });
+//       //   await User.updateOne({ _id: userId }, { $set: { buyAgain: buyList } });
+//       //   return res.status(200).json({ message: "payment successfuly" });
+//       // } else {
+//       //   return res.status(400).json({ message: "payment failed" });
+//       // }
+//     } else {
+//       return res.status(400).json({ message: "user not exist" });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 module.exports = {
   addProduct,
@@ -405,7 +386,6 @@ module.exports = {
   deleteCart,
   deleteFavorite,
   addRate,
-  addImage,
   getBuyAgain,
-  checkout,
+  // checkout,
 };
