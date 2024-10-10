@@ -13,6 +13,7 @@ const connectMongo = require("connect-mongo");
 const authRouter = require("./routers/auth");
 const homeRouter = require("./routers/home");
 const userRouter = require("./routers/user");
+const portfoiloRouter = require("./routers/portfolio");
 const dataRouter = require("./routers/data");
 const authJwt = require("./middlewares/jwt");
 const topSearch = require("./middlewares/topSearch");
@@ -84,6 +85,7 @@ app.use(topSearch);
 app.use(`${url}/auth`, authRouter);
 app.use(`${url}/home`, homeRouter);
 app.use(`${url}/user`, userRouter);
+app.use(`${url}/portfoilo`, portfoiloRouter);
 app.use(`${url}/data`, dataRouter);
 app.use(`/:error`, (req, res) => {
   const { error } = req.params;

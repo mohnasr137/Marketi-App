@@ -1,7 +1,7 @@
 // packages
 
 // imports
-import User from "../../models/user.js";
+const User = require("../../models/user.js");
 
 // init
 const url = process.env.API_URL;
@@ -108,4 +108,4 @@ const editUserData = async (req, res) => {
   }
 };
 
-export { addImage, userData, editUserData };
+module.exports = { addImage, userData, editUserData };

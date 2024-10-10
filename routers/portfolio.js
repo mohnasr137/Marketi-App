@@ -1,14 +1,14 @@
 // packages
-import express from "express";
-import multer from "multer";
-import path from "path";
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
 
 // imports
-import {
+const {
   addImage,
   userData,
   editUserData,
-} from "../controllers/home/portfolio.js";
+} = require("../controllers/home/portfolio.js");
 
 // init
 const portfolioRouter = express.Router();
@@ -40,4 +40,4 @@ portfolioRouter.get("/userData", userData);
 portfolioRouter.post("/editUserData", editUserData);
 
 // exports
-export default portfolioRouter;
+module.exports = portfolioRouter;
