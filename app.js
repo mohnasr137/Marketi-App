@@ -78,7 +78,7 @@ app.use(`${url}/uploads`, express.static(path.join(__dirname, "uploads")));
 // });
 // app.use(passport.initialize());
 // app.use(passport.session());
-// app.use(authJwt);
+app.use(authJwt);
 app.use(topSearch);
 
 // routers
