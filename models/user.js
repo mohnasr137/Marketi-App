@@ -15,11 +15,21 @@ const userSchema = mongoose.Schema({
   email: {
     require: true,
     type: String,
+    unique: true,
     trim: true,
   },
   password: {
     require: true,
     type: String,
+  },
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+    default: "not determined",
+  },
+  address: {
+    type: String,
+    default: "not determined",
   },
   type: {
     type: String,

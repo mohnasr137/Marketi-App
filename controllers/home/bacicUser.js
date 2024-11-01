@@ -161,18 +161,17 @@ const getCart = async (req, res) => {
   try {
     const userId = req.userId;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      let list = [];
-      for (let i = 0; i < existingUser.cart.length; i++) {
-        let existingProduct = await Product.findOne({
-          _id: existingUser.cart[i],
-        });
-        list.push(existingProduct);
-      }
-      return res.status(200).json({ list });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    let list = [];
+    for (let i = 0; i < existingUser.cart.length; i++) {
+      let existingProduct = await Product.findOne({
+        _id: existingUser.cart[i],
+      });
+      list.push(existingProduct);
+    }
+    return res.status(200).json({ list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -182,18 +181,17 @@ const getFavorite = async (req, res) => {
   try {
     const userId = req.userId;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      let list = [];
-      for (let i = 0; i < existingUser.favorite.length; i++) {
-        let existingProduct = await Product.findOne({
-          _id: existingUser.favorite[i],
-        });
-        list.push(existingProduct);
-      }
-      return res.status(200).json({ list });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    let list = [];
+    for (let i = 0; i < existingUser.favorite.length; i++) {
+      let existingProduct = await Product.findOne({
+        _id: existingUser.favorite[i],
+      });
+      list.push(existingProduct);
+    }
+    return res.status(200).json({ list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -204,22 +202,21 @@ const addCart = async (req, res) => {
     const userId = req.userId;
     const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      list = existingUser.cart;
-      let p = true;
-      for (let i = 0; i < list.length; i++) {
-        if (list[i] == productId) {
-          p = false;
-        }
-      }
-      if (p) {
-        list.push(productId);
-      }
-      await User.updateOne({ _id: userId }, { $set: { cart: list } });
-      return res.status(200).json({ message: "add to cart successfuly" });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    list = existingUser.cart;
+    let p = true;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] == productId) {
+        p = false;
+      }
+    }
+    if (p) {
+      list.push(productId);
+    }
+    await User.updateOne({ _id: userId }, { $set: { cart: list } });
+    return res.status(200).json({ message: "add to cart successfuly" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -230,22 +227,21 @@ const addFavorite = async (req, res) => {
     const userId = req.userId;
     const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      list = existingUser.favorite;
-      let p = true;
-      for (let i = 0; i < list.length; i++) {
-        if (list[i] == productId) {
-          p = false;
-        }
-      }
-      if (p) {
-        list.push(productId);
-      }
-      await User.updateOne({ _id: userId }, { $set: { favorite: list } });
-      return res.status(200).json({ message: "add to favorite successfuly" });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    list = existingUser.favorite;
+    let p = true;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] == productId) {
+        p = false;
+      }
+    }
+    if (p) {
+      list.push(productId);
+    }
+    await User.updateOne({ _id: userId }, { $set: { favorite: list } });
+    return res.status(200).json({ message: "add to favorite successfuly" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -256,16 +252,15 @@ const deleteCart = async (req, res) => {
     const userId = req.userId;
     const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      const indexToRemove = existingUser.cart.indexOf(productId);
-      if (indexToRemove !== -1) {
-        const list = existingUser.cart.splice(indexToRemove, 1);
-        await User.updateOne({ _id: userId }, { $set: { cart: list } });
-      }
-      return res.status(200).json({ message: "delete from cart successfuly" });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    const indexToRemove = existingUser.cart.indexOf(productId);
+    if (indexToRemove !== -1) {
+      const list = existingUser.cart.splice(indexToRemove, 1);
+      await User.updateOne({ _id: userId }, { $set: { cart: list } });
+    }
+    return res.status(200).json({ message: "delete from cart successfuly" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -276,18 +271,17 @@ const deleteFavorite = async (req, res) => {
     const userId = req.userId;
     const { productId } = req.body;
     const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      const indexToRemove = existingUser.favorite.indexOf(productId);
-      if (indexToRemove !== -1) {
-        const list = existingUser.favorite.splice(indexToRemove, 1);
-        await User.updateOne({ _id: userId }, { $set: { favorite: list } });
-      }
-      return res
-        .status(200)
-        .json({ message: "delete from favorite successfuly" });
-    } else {
+    if (!existingUser) {
       return res.status(400).json({ message: "user not exist" });
     }
+    const indexToRemove = existingUser.favorite.indexOf(productId);
+    if (indexToRemove !== -1) {
+      const list = existingUser.favorite.splice(indexToRemove, 1);
+      await User.updateOne({ _id: userId }, { $set: { favorite: list } });
+    }
+    return res
+      .status(200)
+      .json({ message: "delete from favorite successfuly" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -305,25 +299,6 @@ const addRate = async (req, res) => {
       return res.status(200).json({ message: "rated successfuly" });
     } else {
       return res.status(400).json({ message: "product not exist" });
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-const addImage = async (req, res) => {
-  try {
-    const userId = req.userId;
-    const imagePath = req.file.path;
-    const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      await User.updateOne({ _id: userId }, { $set: { image: imagePath } });
-      if (path.join(`${url}/images/portfoilo`, "simple.jpg") !== imagePath) {
-        fs.unlinkSync(path.join(__dirname, imagePath));
-      }
-      return res.status(200).json({ message: "image added successfuly" });
-    } else {
-      return res.status(400).json({ message: "user not exist" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -351,48 +326,48 @@ const getBuyAgain = async (req, res) => {
   }
 };
 
-const checkout = async (req, res) => {
-  try {
-    const { userId, products } = req.body;
-    const existingUser = await User.findOne({ _id: userId });
-    if (existingUser) {
-      const list = products.map((x) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: x.product.title,
-          },
-          unit_amount: Math.round(x.product.price * 100),
-        },
-        quantity: x.quantity,
-      }));
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: list,
-        mode: "payment",
-        success_url:
-          "http://localhost:3000/api/v1/user/complete?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "http://localhost:3000/api/v1/user/cancel",
-      });
-      res.redirect(session.url);
-      console.log("here1");
-      // if (session) {
-      //   let buyList = existingUser.buyAgain;
-      //   products.forEach(async (x) => {
-      //     buyList.push(x.product._id);
-      //   });
-      //   await User.updateOne({ _id: userId }, { $set: { buyAgain: buyList } });
-      //   return res.status(200).json({ message: "payment successfuly" });
-      // } else {
-      //   return res.status(400).json({ message: "payment failed" });
-      // }
-    } else {
-      return res.status(400).json({ message: "user not exist" });
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
+// const checkout = async (req, res) => {
+//   try {
+//     const { userId, products } = req.body;
+//     const existingUser = await User.findOne({ _id: userId });
+//     if (existingUser) {
+//       const list = products.map((x) => ({
+//         price_data: {
+//           currency: "usd",
+//           product_data: {
+//             name: x.product.title,
+//           },
+//           unit_amount: Math.round(x.product.price * 100),
+//         },
+//         quantity: x.quantity,
+//       }));
+//       const session = await stripe.checkout.sessions.create({
+//         payment_method_types: ["card"],
+//         line_items: list,
+//         mode: "payment",
+//         success_url:
+//           "http://localhost:3000/api/v1/user/complete?session_id={CHECKOUT_SESSION_ID}",
+//         cancel_url: "http://localhost:3000/api/v1/user/cancel",
+//       });
+//       res.redirect(session.url);
+//       console.log("here1");
+//       // if (session) {
+//       //   let buyList = existingUser.buyAgain;
+//       //   products.forEach(async (x) => {
+//       //     buyList.push(x.product._id);
+//       //   });
+//       //   await User.updateOne({ _id: userId }, { $set: { buyAgain: buyList } });
+//       //   return res.status(200).json({ message: "payment successfuly" });
+//       // } else {
+//       //   return res.status(400).json({ message: "payment failed" });
+//       // }
+//     } else {
+//       return res.status(400).json({ message: "user not exist" });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 module.exports = {
   addProduct,
@@ -405,7 +380,6 @@ module.exports = {
   deleteCart,
   deleteFavorite,
   addRate,
-  addImage,
   getBuyAgain,
-  checkout,
+  // checkout,
 };
