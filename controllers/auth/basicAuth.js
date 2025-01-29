@@ -14,7 +14,12 @@ const url = process.env.API_URL;
 const signUp = async (req, res) => {
   try {
     const { name, phone, email, password, confirmPassword } = req.body;
-    const image = path.join(`${url}/images/portfoilo`, "simple.jpg");
+    const image =
+      req.protocol +
+      "://" +
+      req.get("host") +
+      path.join(`${url}/portfolio`, "simple.jpg");
+
     const nameMatch = /^[A-Za-z0-9]*$/;
     const emailMatch =
       /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;

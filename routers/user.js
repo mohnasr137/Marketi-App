@@ -24,7 +24,7 @@ const {
 const userRouter = express.Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "images/uploads/");
   },
   filename: (req, file, cb) => {
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
