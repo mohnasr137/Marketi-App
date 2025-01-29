@@ -7,7 +7,10 @@ const api_url = process.env.API_URL;
 const arr = [
   { url: `${api_url}/auth/signUp`, method: "POST" },
   { url: `${api_url}/auth/signIn`, method: "POST" },
-  { url: /^\/api\/v1\/auth\/token\/.+$/, method: "GET" },
+  { url: `${api_url}/auth/sendPassEmail`, method: "POST" },
+  { url: `${api_url}/auth/activeResetPass`, method: "POST" },
+  { url: `${api_url}/auth/resetPassword`, method: "POST" },
+  { url: /^\/api\/v1\/auth\/.+$/, method: "GET" },
 ];
 
 // routers

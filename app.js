@@ -31,8 +31,14 @@ app.options("*", cors());
 //app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(`${url}/images`, express.static(path.join(__dirname, "images")));
-app.use(`${url}/uploads`, express.static(path.join(__dirname, "uploads")));
+app.use(
+  `${url}/uploads`,
+  express.static(path.join(__dirname, "images", "uploads"))
+);
+app.use(
+  `${url}/portfolio`,
+  express.static(path.join(__dirname, "images", "portfolio"))
+);
 // app.use(
 //   `${url}/images/brands`,
 //   express.static(path.join(__dirname, "views", "brands"))
