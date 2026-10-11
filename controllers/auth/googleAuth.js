@@ -1,39 +1,34 @@
-// const passport = require("passport");
-// const GoogleStrategy = require("passport-google-oauth20");
-// const googleUser = require("../../models/googleUser");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GoogleUser = require("../../models/googleUser");
 
-// passport.serializeUser((user, done) => {
-//   done(null, user.id);
-// });
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${process.env.API_URL || "/api/v1"}/auth/oAuth/google/redirect`,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          let user = await GoogleUser.findOne({ googleID: profile.id });
+          if (!user) {
+            user = new GoogleUser({
+              name: profile.displayName || "Google User",
+              googleID: profile.id,
+              email: profile.emails?.[0]?.value || "",
+              verify: true,
+            });
+            await user.save();
+          }
+          return done(null, user);
+        } catch (err) {
+          return done(err, null);
+        }
+      }
+    )
+  );
+}
 
-// passport.deserializeUser((id,done)=>{
-//   googleUser.findById({googleID:id}).then((user)=>{
-//     done(null,user)
-//   })
-// })
-
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//       callbackURL: "/api/v1/auth/oAuth/google/redirect",
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-//       //   return cb(err, user);
-//       // });
-//       const existingUser = await googleUser.findOne({ googleID: profile.id });
-//       if (!existingUser) {
-//         let user = new googleUser({
-//           name: profile.displayName,
-//           googleID: profile.id,
-//         });
-//         user = await user.save();
-//         done(null, user);
-//       } else {
-//         done(null, existingUser);
-//       }
-//     }
-//   )
-// );
+module.exports = passport;

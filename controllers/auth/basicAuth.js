@@ -1,71 +1,77 @@
-// packages
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const path = require("path");
-
-// imports
 const User = require("../../models/user");
 const { sendVerifyEmail } = require("./verifyEmail");
 
-// init
-const url = process.env.API_URL;
-
-// routers
 const signUp = async (req, res) => {
   try {
     const { name, phone, email, password, confirmPassword } = req.body;
-    const image =
-      req.protocol +
-      "://" +
-      req.get("host") +
-      path.join(`${url}/portfolio`, "simple.jpg");
+    const apiUrl = process.env.API_URL || "/api/v1";
+    const defaultAvatar = `${req.protocol}://${req.get("host")}${apiUrl}/portfolio/simple.jpg`;
 
-    const nameMatch = /^[A-Za-z0-9]*$/;
+    if (!name || !phone || !email || !password || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const nameMatch = /^[A-Za-z0-9\s-_]{2,50}$/;
     const emailMatch =
       /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     const passwordMatch =
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-    if (!name.match(nameMatch)) {
-      return res.status(400).json({ message: "please enter a valid name" });
+
+    if (!nameMatch.test(name.trim())) {
+      return res.status(400).json({
+        message: "Please enter a valid name (2-50 characters, letters, numbers, spaces)",
+      });
     }
-    if (!email.match(emailMatch)) {
-      return res.status(400).json({ message: "please enter a valid email" });
+    if (!emailMatch.test(email.trim())) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
     }
-    if (!password.match(passwordMatch)) {
-      return res.status(400).json({ message: "please enter a valid password" });
+    if (!passwordMatch.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character (#?!@$%^&*-)",
+      });
     }
     if (password !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ message: "password and confirm password are not the same" });
+      return res.status(400).json({ message: "Password and confirm password do not match" });
     }
-    const existingUser = await User.findOne({ email });
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser && existingUser.verify === true) {
-      return res
-        .status(400)
-        .json({ message: "the user with same email already exists!" });
+      return res.status(400).json({ message: "A user with this email already exists!" });
     }
     if (existingUser && existingUser.verify === false) {
-      await User.deleteOne({ email });
+      await User.deleteOne({ email: normalizedEmail });
     }
+
     const hashedPassword = await bcryptjs.hash(password, 8);
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
+
     const user = new User({
-      name,
-      phone,
-      email,
+      name: name.trim(),
+      phone: phone.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       code,
-      image,
+      image: defaultAvatar,
     });
     await user.save();
-    const token = jwt.sign({ id: user._id, code: code }, process.env.SECRET);
-    const link =
-      req.protocol + "://" + req.get("host") + `/api/v1/auth/${token}`;
-    sendVerifyEmail(email, link);
-    return res
-      .status(200)
-      .json({ message: "user created and Verify email send successfully" });
+
+    const token = jwt.sign(
+      { id: user._id, code: code },
+      process.env.SECRET || "secret_key",
+      { expiresIn: "24h" }
+    );
+    const link = `${req.protocol}://${req.get("host")}${apiUrl}/auth/verify/${token}`;
+
+    await sendVerifyEmail(user.email, link);
+
+    return res.status(201).json({
+      message: "User registered successfully. Verification email sent.",
+      userId: user._id,
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -74,31 +80,48 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "the user with this email not found!" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     if (user.verify === false) {
-      return res
-        .status(400)
-        .json({ message: "the user with this email not verifyed!" });
+      return res.status(403).json({
+        message: "User email has not been verified. Please check your inbox.",
+      });
     }
+
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password." });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
-    const token = jwt.sign({ id: user._id }, process.env.SECRET);
-    const name = user.name;
-    res.json({
-      message: "login successfully",
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.SECRET || "secret_key",
+      { expiresIn: "7d" }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
       token,
-      name,
+      name: user.name,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        type: user.type,
+      },
       statusCode: 200,
       status: true,
     });
-    //res.redirect(301, `${url}/home/start`);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

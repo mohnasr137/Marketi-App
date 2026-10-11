@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-const Category = require("./category");
 
-const productSchema = mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -29,49 +28,50 @@ const productSchema = mongoose.Schema(
       type: Number,
       min: 0,
       max: 5,
-      default: 1.3,
+      default: 0,
     },
     location: {
       name: {
         type: String,
         trim: true,
+        default: "General",
       },
       location: {
         type: {
           type: String,
           enum: ["Point"],
-          required: true,
+          default: "Point",
         },
         coordinates: {
           type: [Number],
-          required: true,
           default: [0, 0],
         },
       },
     },
     discount: {
       type: Number,
-      required: true,
       min: 0,
       max: 100,
+      default: 0,
     },
     remain: {
       type: Number,
-      required: true,
       min: 0,
+      default: 0,
     },
     sold: {
       type: Number,
       min: 0,
+      default: 0,
     },
     category: {
-      required: true,
       type: String,
+      required: true,
       trim: true,
     },
     brand: {
-      required: true,
       type: String,
+      required: true,
       trim: true,
     },
   },
@@ -79,6 +79,10 @@ const productSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Search and filter indexes
+productSchema.index({ title: "text", description: "text" });
+productSchema.index({ category: 1, brand: 1, price: 1 });
 
 const Product = mongoose.model("Product", productSchema);
 

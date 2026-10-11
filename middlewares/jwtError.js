@@ -1,30 +1,20 @@
-const {expressjwt} = require("express-jwt");
-
-function authJwt() {
-  const secret = process.env.SECRET;
-  const api = process.env.API_URL;
-  return expressjwt({
-    secret,
-    algorithms: ["HS256"],
-    isRevoked: isRevoked,
-  }).unless({
-    path: [
-      { url: /\/public\/uploads(.*)/, methods: ["GET", "OPTIONS"] },
-      { url: /\/api\/v1\/products(.*)/, methods: ["GET", "OPTIONS"] },
-      { url: /\/api\/v1\/categories(.*)/, methods: ["GET", "OPTIONS"] },
-      { url: /\/api\/v1\/orders(.*)/, methods: ["GET", "OPTIONS", "POST"] },
-      `${api}/users/login`,
-      `${api}/users/register`,
-    ],
-  });
-}
-
-async function isRevoked(req, payload, done) {
-  if (!payload.isAdmin) {
-    done(null, true);
+// JWT Error handling middleware helper
+const jwtErrorHandler = (err, req, res, next) => {
+  if (err.name === "UnauthorizedError" || err.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      error: "Unauthorized",
+      message: "Invalid or missing authorization token",
+    });
   }
 
-  done();
-}
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      error: "TokenExpired",
+      message: "Authorization token has expired. Please log in again.",
+    });
+  }
 
-module.exports = authJwt;
+  return next(err);
+};
+
+module.exports = jwtErrorHandler;
