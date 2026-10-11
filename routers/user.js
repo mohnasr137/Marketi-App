@@ -1,10 +1,8 @@
-// packages
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const fs = require("fs");
 
-// imports
 const {
   addProduct,
   editProduct,
@@ -17,11 +15,17 @@ const {
   deleteFavorite,
   addRate,
   getBuyAgain,
-  // checkout,
-} = require("../controllers/home/bacicUser");
+  checkout,
+} = require("../controllers/home/basicUser");
 
-// init
 const userRouter = express.Router();
+
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, "../images/uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images/uploads/");
@@ -29,49 +33,55 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const code = `${Math.floor(100000 + Math.random() * 900000)}`;
     const ext = path.extname(file.originalname);
-    cb(null, Date.now() + "-" + code + ext);
+    cb(null, `${Date.now()}-${code}${ext}`);
   },
 });
+
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5000000 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type"));
+      cb(new Error("Invalid file type: Only images are allowed"));
     }
   },
 });
 
-// routers
+// Product Management
 userRouter.post("/addProduct", upload.array("files", 5), addProduct);
-userRouter.put("/editProduct", upload.array("files", 5), editProduct);
-userRouter.delete("/deleteProduct", deleteProduct);
+userRouter.put("/editProduct/:productId?", upload.array("files", 5), editProduct);
+userRouter.delete("/deleteProduct/:productId?", deleteProduct);
+
+// Cart Endpoints
 userRouter.get("/getCart", getCart);
-userRouter.get("/getFavorite", getFavorite);
 userRouter.post("/addCart", addCart);
+userRouter.delete("/deleteCart/:productId?", deleteCart);
+
+// Favorites Endpoints
+userRouter.get("/getFavorite", getFavorite);
 userRouter.post("/addFavorite", addFavorite);
-userRouter.delete("/deleteCart", deleteCart);
-userRouter.delete("/deleteFavorite", deleteFavorite);
+userRouter.delete("/deleteFavorite/:productId?", deleteFavorite);
+
+// Ratings & History
 userRouter.post("/addRate", addRate);
 userRouter.get("/getBuyAgain", getBuyAgain);
-// userRouter.post("/checkout", checkout);
 
-// userRouter.get("/complete", async (req, res) => {
-//   const session = await stripe.checkout.sessions.retrieve(
-//     req.query.session_id,
-//     {
-//       expand: ["payment_intent.payment_method"],
-//     }
-//   );
-
-//   console.log(JSON.stringify(session));
-//   res.send("Your payment was successful");
-// });
-
-// userRouter.get("/cancel", (req, res) => {
-//   res.redirect("/");
-// });
+// Payments & Checkout
+userRouter.post("/checkout", checkout);
+userRouter.get("/complete", (req, res) => {
+  res.status(200).json({
+    status: true,
+    message: "Your payment was successful",
+    sessionId: req.query.session_id,
+  });
+});
+userRouter.get("/cancel", (req, res) => {
+  res.status(200).json({
+    status: false,
+    message: "Checkout was cancelled",
+  });
+});
 
 module.exports = userRouter;

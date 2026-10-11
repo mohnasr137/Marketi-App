@@ -1,54 +1,75 @@
-// packages
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// init
-const api_url = process.env.API_URL;
-const arr = [
-  { url: `${api_url}/auth/signUp`, method: "POST" },
-  { url: `${api_url}/auth/signIn`, method: "POST" },
-  { url: `${api_url}/auth/sendPassEmail`, method: "POST" },
-  { url: `${api_url}/auth/activeResetPass`, method: "POST" },
-  { url: `${api_url}/auth/resetPassword`, method: "POST" },
-  { url: /^\/api\/v1\/auth\/.+$/, method: "GET" },
-];
-
-// routers
 const authJwt = async (req, res, next) => {
   try {
-    const { url: reqUrl, method: reqMethod } = req;
-    for (const element of arr) {
-      if (element.method != reqMethod) continue;
-
-      if (typeof element.url == "string") {
-        const baseUrl = reqUrl.split("?")[0];
-        if (baseUrl == element.url) {
-          return next();
-        }
-      } else if (element.url instanceof RegExp && element.url.test(reqUrl)) {
-        return next();
-      }
+    // Automatically allow CORS preflight requests
+    if (req.method === "OPTIONS") {
+      return next();
     }
 
-    const authHeader = req.headers["authorization"];
+    const apiUrl = process.env.API_URL || "/api/v1";
+    const currentPath = (req.originalUrl || req.url).split("?")[0].replace(/\/+$/, "");
+    const method = req.method;
+
+    // Public routes that don't require authentication
+    const isPublicAuth =
+      currentPath.startsWith(`${apiUrl}/auth/`) ||
+      currentPath === `${apiUrl}/auth/signUp` ||
+      currentPath === `${apiUrl}/auth/signIn` ||
+      currentPath === `${apiUrl}/auth/sendPassEmail` ||
+      currentPath === `${apiUrl}/auth/activeResetPass` ||
+      currentPath === `${apiUrl}/auth/resetPassword`;
+
+    const isPublicGet =
+      method === "GET" &&
+      (currentPath === "" ||
+        currentPath === "/" ||
+        currentPath === `${apiUrl}` ||
+        currentPath.startsWith(`${apiUrl}/home`) ||
+        currentPath.startsWith(`${apiUrl}/uploads`) ||
+        currentPath.startsWith(`${apiUrl}/portfolio`) ||
+        currentPath.startsWith(`${apiUrl}/images`) ||
+        currentPath.startsWith(`${apiUrl}/data/start`) ||
+        currentPath.startsWith(`${apiUrl}/data/test`));
+
+    if (isPublicAuth || isPublicGet) {
+      return next();
+    }
+
+    const authHeader = req.headers["authorization"] || req.headers["x-access-token"];
     if (!authHeader) {
-      return res.status(401).json({ error: "No token provided" });
+      return res.status(401).json({ error: "No authentication token provided" });
     }
 
-    const token = authHeader.split(" ")[1];
-    const isVerify = jwt.verify(token, process.env.SECRET);
-    if (!isVerify) {
-      return res.status(401).json({ error: "Token verification failed" });
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7).trim()
+      : authHeader.trim();
+
+    if (!token) {
+      return res.status(401).json({ error: "Malformed authorization header" });
     }
-    const existingUser = await User.findById(isVerify.id);
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.SECRET || "secret_key");
+    } catch (jwtError) {
+      return res.status(401).json({
+        error: jwtError.name === "TokenExpiredError" ? "Token has expired" : "Invalid token",
+      });
+    }
+
+    const existingUser = await User.findById(decoded.id);
     if (!existingUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    if (existingUser.verify == false) {
-      return res.status(400).json({ error: "User email not verified" });
+      return res.status(404).json({ error: "User account not found" });
     }
 
-    req.userId = isVerify.id;
+    if (existingUser.verify === false) {
+      return res.status(403).json({ error: "User email has not been verified" });
+    }
+
+    req.user = existingUser;
+    req.userId = existingUser._id.toString();
     return next();
   } catch (error) {
     return res.status(500).json({ error: error.message });

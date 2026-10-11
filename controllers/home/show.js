@@ -1,43 +1,42 @@
-// packages
 const path = require("path");
 const fs = require("fs").promises;
+const fsSync = require("fs");
+const mongoose = require("mongoose");
 
-// imports
 const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Brand = require("../../models/brand");
 const TopSearch = require("../../models/topSearch");
+const Banner = require("../../models/banner");
 
-// init
-const url = process.env.API_URL;
+const url = process.env.API_URL || "/api/v1";
 
-// routers
 const allProducts = async (req, res) => {
   try {
-    const { skip, search, brand, category, rating, price, discount, popular } =
-      req.body;
+    const params = { ...req.query, ...req.body };
+    const { search, brand, category, rating, price, discount, popular } = params;
+    const skip = Math.max(0, parseInt(params.skip, 10) || 0);
+    const limit = Math.max(1, Math.min(100, parseInt(params.limit, 10) || 10));
+
     const query = {};
     if (brand) query.brand = brand;
     if (category) query.category = category;
-    if (search) {
+
+    if (search && typeof search === "string" && search.trim()) {
+      const sanitized = search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { title: { $regex: sanitized, $options: "i" } },
+        { description: { $regex: sanitized, $options: "i" } },
       ];
-      const existingSearch = await TopSearch.findOne({
-        $or: [{ data: { $regex: search, $options: "i" } }],
-      });
-      if (existingSearch) {
-        const number = existingSearch.number + 1;
-        await TopSearch.updateOne(
-          { _id: existingSearch._id },
-          { $set: { number } }
-        );
-      } else {
-        const topSearch = new TopSearch({ data: search });
-        await topSearch.save();
-      }
+
+      // Atomic increment or insert for search analytics
+      await TopSearch.findOneAndUpdate(
+        { data: search.trim() },
+        { $inc: { number: 1 } },
+        { upsert: true, new: true }
+      );
     }
+
     const sort = {};
     if (rating) sort.rating = rating === "up" ? 1 : -1;
     if (price) sort.price = price === "up" ? 1 : -1;
@@ -46,16 +45,39 @@ const allProducts = async (req, res) => {
       sort.rating = -1;
       sort.sold = -1;
     }
+
+    const total = await Product.countDocuments(query);
     const list = await Product.find(query)
       .sort(sort)
-      .skip(skip * 10)
-      .limit(10)
+      .skip(skip * limit)
+      .limit(limit)
       .exec();
-    if (list.length === 0) {
-      return res.status(404).json({ message: "No results found." });
-    } else {
-      return res.status(200).json({ list });
+
+    return res.status(200).json({
+      total,
+      page: skip + 1,
+      limit,
+      count: list.length,
+      list,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getProductById = async (req, res) => {
+  try {
+    const id = req.params.id || req.query.id || req.body.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid product ID format" });
     }
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json({ product });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -63,18 +85,11 @@ const allProducts = async (req, res) => {
 
 const allCategories = async (req, res) => {
   try {
-    const { name } = req.body;
-    let list;
-    if (name) {
-      list = await Category.find({}, { name: 1, _id: 0 });
-    } else {
-      list = await Category.find();
-    }
-    if (list.length == 0) {
-      return res.status(404).json({ message: "there is no result" });
-    } else {
-      return res.status(200).json({ list });
-    }
+    const params = { ...req.query, ...req.body };
+    const projection = params.name ? { name: 1, imagePath: 1, _id: 0 } : {};
+    const list = await Category.find({}, projection);
+
+    return res.status(200).json({ count: list.length, list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -82,18 +97,11 @@ const allCategories = async (req, res) => {
 
 const allBrands = async (req, res) => {
   try {
-    const { name } = req.body;
-    let list;
-    if (name) {
-      list = await Brand.find({}, { name: 1, _id: 0 });
-    } else {
-      list = await Brand.find();
-    }
-    if (list.length == 0) {
-      return res.status(404).json({ message: "there is no result" });
-    } else {
-      return res.status(200).json({ list });
-    }
+    const params = { ...req.query, ...req.body };
+    const projection = params.name ? { name: 1, imagePath: 1, _id: 0 } : {};
+    const list = await Brand.find({}, projection);
+
+    return res.status(200).json({ count: list.length, list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -102,11 +110,7 @@ const allBrands = async (req, res) => {
 const allTopSearch = async (req, res) => {
   try {
     const list = await TopSearch.find().sort({ number: -1 }).limit(10).exec();
-    if (list.length == 0) {
-      return res.status(404).json({ message: "there is no result" });
-    } else {
-      return res.status(200).json({ list });
-    }
+    return res.status(200).json({ count: list.length, list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -114,18 +118,23 @@ const allTopSearch = async (req, res) => {
 
 const allBanners = async (req, res) => {
   try {
-    let list = [];
+    const dbBanners = await Banner.find();
+    if (dbBanners.length > 0) {
+      return res.status(200).json({
+        count: dbBanners.length,
+        list: dbBanners.map((b) => b.imagePath || b.name),
+      });
+    }
+
     const directoryPath = path.join(__dirname, "../../images/banners");
+    if (!fsSync.existsSync(directoryPath)) {
+      return res.status(200).json({ count: 0, list: [] });
+    }
+
     const files = await fs.readdir(directoryPath);
-    for (const file of files) {
-      const imagePath = path.join(`${url}/images/banners`, file);
-      list.push(imagePath);
-    }
-    if (list.length == 0) {
-      return res.status(404).json({ message: "there is no result" });
-    } else {
-      return res.status(200).json({ list });
-    }
+    const list = files.map((file) => `${url}/images/banners/${file}`);
+
+    return res.status(200).json({ count: list.length, list });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -133,9 +142,9 @@ const allBanners = async (req, res) => {
 
 module.exports = {
   allProducts,
+  getProductById,
   allBrands,
   allCategories,
   allBanners,
   allTopSearch,
-  allBanners,
 };

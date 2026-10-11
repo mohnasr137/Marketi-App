@@ -1,20 +1,18 @@
-// packages
 const express = require("express");
-
-// imports
 const {
   allProducts,
+  getProductById,
   allBrands,
   allBanners,
   allCategories,
   allTopSearch,
 } = require("../controllers/home/show");
 
-// init
 const homeRouter = express.Router();
 
-// routers
+// Catalog & Product Endpoints
 homeRouter.get("/products", allProducts);
+homeRouter.get("/products/:id", getProductById);
 homeRouter.get("/categories", allCategories);
 homeRouter.get("/brands", allBrands);
 homeRouter.get("/banners", allBanners);

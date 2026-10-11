@@ -1,33 +1,37 @@
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema({
-  name: {
-    require: true,
-    type: String,
-    trim: true,
+const googleUserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    googleID: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    type: {
+      type: String,
+      default: "user",
+    },
+    verify: {
+      type: Boolean,
+      default: true,
+    },
   },
-  googleID: {
-    require: true,
-    type: String,
-    trim: true,
-  },
-  type: {
-    type: String,
-    default: "user",
-  },
-  verify: {
-    type: Boolean,
-    default: true,
-  },
-  resetPass: {
-    type: Boolean,
-    default: false,
-  },
-  code: {
-    type: String,
-  },
-  //cart
-});
+  {
+    timestamps: true,
+  }
+);
 
-const googleUser = mongoose.model("GoogleUser", userSchema);
-module.exports = googleUser;
+const GoogleUser = mongoose.model("GoogleUser", googleUserSchema);
+module.exports = GoogleUser;

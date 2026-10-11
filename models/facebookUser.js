@@ -1,33 +1,37 @@
 const mongoose = require("mongoose");
 
-const userSchema = mongoose.Schema({
-  name: {
-    require: true,
-    type: String,
-    trim: true,
+const facebookUserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    facebookID: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    type: {
+      type: String,
+      default: "user",
+    },
+    verify: {
+      type: Boolean,
+      default: true,
+    },
   },
-  facebookID: {
-    require: true,
-    type: String,
-    trim: true,
-  },
-  type: {
-    type: String,
-    default: "user",
-  },
-  verify: {
-    type: Boolean,
-    default: true,
-  },
-  resetPass: {
-    type: Boolean,
-    default: false,
-  },
-  code: {
-    type: String,
-  },
-  //cart
-});
+  {
+    timestamps: true,
+  }
+);
 
-const facebookUser = mongoose.model("FacebookUser", userSchema);
-module.exports = facebookUser;
+const FacebookUser = mongoose.model("FacebookUser", facebookUserSchema);
+module.exports = FacebookUser;

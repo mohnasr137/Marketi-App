@@ -1,14 +1,21 @@
 {
-  "name": "ecommerce",
+  "name": "market-i",
   "version": "1.0.0",
-  "description": "",
+  "description": "E-Commerce RESTful API backend built with Express, MongoDB, Mongoose, and JWT authentication.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon --env-file .env app.js"
+    "dev": "nodemon app.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ecommerce",
+    "express",
+    "mongodb",
+    "mongoose",
+    "jwt",
+    "rest-api"
+  ],
+  "author": "Mohamed Nasr",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -29,7 +36,6 @@
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
-    "path": "^0.12.7",
     "stripe": "^16.2.0",
     "twilio": "^4.22.0"
   }
