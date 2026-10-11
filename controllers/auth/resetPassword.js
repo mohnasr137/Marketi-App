@@ -43,7 +43,7 @@ const sendPassEmail = async (req, res) => {
     await transporter.sendMail({
       from: process.env.USER,
       to: normalizedEmail,
-      subject: "Password Reset Code - Marketi",
+      subject: "Password Reset Code - Market-i",
       text: `Your password reset code is: ${code}`,
       html: `
       <div style="font-family: Arial, sans-serif; padding: 24px; color: #333; line-height: 1.6; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px;">

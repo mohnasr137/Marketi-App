@@ -1,5 +1,5 @@
 {
-  "name": "marketi-app",
+  "name": "market-i",
   "version": "1.0.0",
   "description": "E-Commerce RESTful API backend built with Express, MongoDB, Mongoose, and JWT authentication.",
   "main": "app.js",

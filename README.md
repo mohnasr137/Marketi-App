@@ -1,11 +1,11 @@
-# Marketi API
+# Market-i API
 
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/express-4.x-blue.svg)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/mongodb-mongoose-green.svg)](https://mongoosejs.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
 
-A production-ready, feature-complete RESTful backend API for the **Marketi** E-Commerce platform, built using **Node.js**, **Express**, **MongoDB (Mongoose)**, and **JSON Web Tokens (JWT)**.
+A production-ready, feature-complete RESTful backend API for the **Market-i** E-Commerce platform, built using **Node.js**, **Express**, **MongoDB (Mongoose)**, and **JSON Web Tokens (JWT)**.
 
 ---
 
@@ -57,7 +57,7 @@ A production-ready, feature-complete RESTful backend API for the **Marketi** E-C
 ## 📁 Project Structure
 
 ```text
-Marketi-App/
+market-i/
 ├── app.js                         # Application entrypoint & middleware configuration
 ├── package.json                   # Dependencies & npm scripts
 ├── .env.example                   # Environment variable template
@@ -121,7 +121,7 @@ Marketi-App/
 Clone the repository and install dependencies:
 
 ```bash
-cd Marketi-App
+cd market-i
 npm install
 ```
 
@@ -138,7 +138,7 @@ Configure your variables inside `.env`:
 ```env
 PORT=3000
 API_URL=/api/v1
-CONNECTION_STRING=mongodb://localhost:27017/marketi
+CONNECTION_STRING=mongodb://localhost:27017/market-i
 SECRET=your_jwt_super_secret_key_here
 
 # Nodemailer Gmail credentials (optional for testing)

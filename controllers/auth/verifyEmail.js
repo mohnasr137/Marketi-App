@@ -18,11 +18,11 @@ const sendVerifyEmail = async (email, link) => {
     await transporter.sendMail({
       from: process.env.USER,
       to: email,
-      subject: "Account Verification - Marketi",
+      subject: "Account Verification - Market-i",
       text: `Welcome! Please verify your account by clicking the following link: ${link}`,
       html: `
       <div style="font-family: Arial, sans-serif; padding: 24px; color: #333; line-height: 1.6; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px;">
-        <h2 style="color: #007bff; margin-top: 0;">Welcome to Marketi!</h2>
+        <h2 style="color: #007bff; margin-top: 0;">Welcome to Market-i!</h2>
         <p>Thank you for signing up. Please verify your email address to activate your account:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${link}" style="background-color: #007bff; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Verify Email</a>
@@ -30,7 +30,7 @@ const sendVerifyEmail = async (email, link) => {
         <p style="color: #777; font-size: 13px;">If clicking the button doesn't work, copy and paste this link into your browser:</p>
         <p style="color: #555; font-size: 12px; word-break: break-all;">${link}</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-        <p style="color: #999; font-size: 12px; margin-bottom: 0;">If you did not create a Marketi account, please safely ignore this email.</p>
+        <p style="color: #999; font-size: 12px; margin-bottom: 0;">If you did not create a Market-i account, please safely ignore this email.</p>
       </div>
       `,
     });

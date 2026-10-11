@@ -39,7 +39,7 @@ app.use(topSearch);
 // health check endpoint
 app.get("/", (req, res) => {
   res.status(200).json({
-    name: "Marketi API",
+    name: "Market-i API",
     status: "online",
     documentation: `${url}/home/products`,
     version: "1.0.0",
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 
 app.get(`${url}`, (req, res) => {
   res.status(200).json({
-    name: "Marketi API",
+    name: "Market-i API",
     status: "online",
     version: "1.0.0",
   });
@@ -88,7 +88,7 @@ if (!connectionString) {
 }
 
 mongoose
-  .connect(connectionString || "mongodb://localhost:27017/marketi")
+  .connect(connectionString || "mongodb://localhost:27017/market-i")
   .then(() => {
     console.log("MongoDB connected successfully");
   })
@@ -97,7 +97,7 @@ mongoose
   });
 
 app.listen(port, () => {
-  console.log(`Marketi Server running on http://localhost:${port}${url}`);
+  console.log(`Market-i Server running on http://localhost:${port}${url}`);
 });
 
 module.exports = app;
