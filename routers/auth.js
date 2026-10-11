@@ -1,6 +1,6 @@
 // packages
 const express = require("express");
-const passport = require("passport");
+// const passport = require("passport");
 
 // imports
 const { signUp, signIn } = require("../controllers/auth/basicAuth");

@@ -4,10 +4,11 @@ const mongoose = require("mongoose");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const passport = require("passport");
+// const passport = require("passport");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
 const connectMongo = require("connect-mongo");
+
 
 // imports
 const authRouter = require("./routers/auth");
@@ -17,8 +18,10 @@ const portfoiloRouter = require("./routers/portfolio");
 const dataRouter = require("./routers/data");
 const authJwt = require("./middlewares/jwt");
 const topSearch = require("./middlewares/topSearch");
-const passportGoogleSetup = require("./controllers/auth/googleAuth");
-const passportFacebookSetup = require("./controllers/auth/facebookAuth");
+// const passportGoogleSetup = require("./controllers/auth/googleAuth");
+// const passportFacebookSetup = require("./controllers/auth/facebookAuth");
+require("dotenv").config();
+
 
 // init
 const app = express();
