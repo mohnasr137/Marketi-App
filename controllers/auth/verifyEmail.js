@@ -1,10 +1,10 @@
 // packages
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const twilio = require("twilio")(
-  process.env.WILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// const twilio = require("twilio")(
+//   process.env.WILIO_ACCOUNT_SID,
+//   process.env.TWILIO_AUTH_TOKEN
+// );
 
 // imports
 const User = require("../../models/user");
